@@ -1,0 +1,193 @@
+openapi: 3.0.1
+info:
+  title: Spring Core + Spark API
+  description: REST API using Spring Core for DI and Spark for HTTP endpoints
+  contact:
+    name: API Team
+    email: team@example.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:4567
+    description: Development server
+
+tags:
+  - name: Users
+    description: User management operations
+
+paths:
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: Retrieve a list of all users
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Successfully retrieved list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      description: Create a new user with the provided information
+      operationId: createUser
+      requestBody:
+        description: User object to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieve a single user by their ID
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Update an existing user's information
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Updated user information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Delete a user by their ID
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User ID
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          format: email
+          description: User email
+    UserRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          format: email
+          description: User email
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message

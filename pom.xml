@@ -57,6 +57,23 @@
             <artifactId>swagger-annotations</artifactId>
             <version>2.2.19</version>
         </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>2.1.19</version>
+        </dependency>
+
+        <!-- Jackson for JSON serialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.15.3</version>
+        </dependency>
 
         <!-- Gson for JSON -->
         <dependency>
@@ -75,6 +92,17 @@
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.yaml</include>
+                    <include>**/*.yml</include>
+                    <include>**/*.json</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <!-- Kotlin Maven Plugin -->
             <plugin>
