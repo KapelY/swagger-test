@@ -11,50 +11,17 @@ class SwaggerGenerator() {
     private var cachedOpenAPI: OpenAPI? = null
 
     fun generateOpenAPI(): OpenAPI {
-        if (cachedOpenAPI != null) {
-            return cachedOpenAPI!!
-        }
+        cachedOpenAPI?.let { return it }
 
-        try {
-            println("Attempting to load swagger-config.yaml from classpath...")
+        val resourceStream = javaClass.classLoader.getResourceAsStream("swagger-config.yaml")
+            ?: throw IllegalStateException("swagger-config.yaml not found in resources")
 
-            // Try to load from YAML first
-            val resourceStream = javaClass.classLoader.getResourceAsStream("swagger-config.yaml")
+        val content = InputStreamReader(resourceStream).use { it.readText() }
+        val parseResult = OpenAPIV3Parser().readContents(content, null, null)
 
-            if (resourceStream == null) {
-                println("ERROR: swagger-config.yaml not found in classpath!")
-                println("Available resources:")
-                val resources = javaClass.classLoader.getResources("")
-                while (resources.hasMoreElements()) {
-                    println("  - ${resources.nextElement()}")
-                }
-                throw IllegalStateException("swagger-config.yaml not found in resources")
-            }
+        cachedOpenAPI = parseResult.openAPI
+            ?: throw IllegalStateException("Failed to parse OpenAPI specification")
 
-            val content = InputStreamReader(resourceStream).use { it.readText() }
-            println("Loaded swagger config, length: ${content.length} bytes")
-            println("First 200 chars: ${content.take(200)}")
-
-            val parser = OpenAPIV3Parser()
-            val parseResult = parser.readContents(content, null, null)
-
-            if (parseResult.messages != null && parseResult.messages.isNotEmpty()) {
-                println("Swagger parsing messages: ${parseResult.messages}")
-            }
-
-            if (parseResult.openAPI == null) {
-                println("ERROR: Parser returned null OpenAPI object")
-                throw IllegalStateException("Failed to parse OpenAPI specification - parser returned null")
-            }
-
-            cachedOpenAPI = parseResult.openAPI
-            println("Successfully parsed OpenAPI spec")
-
-            return cachedOpenAPI!!
-        } catch (e: Exception) {
-            println("ERROR loading swagger config: ${e.message}")
-            e.printStackTrace()
-            throw e
-        }
+        return cachedOpenAPI!!
     }
 }
