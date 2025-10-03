@@ -1,5 +1,7 @@
 package com.example.config
 
+import SwaggerGenerator
+import com.example.routes.SparkRoutes
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -31,5 +33,10 @@ open class AppConfig {
             setSerializationInclusion(JsonInclude.Include.NON_NULL)
             enable(SerializationFeature.INDENT_OUTPUT)
         }
+    }
+
+    @Bean
+    open fun swaggerGenerator(): SwaggerGenerator {
+        return SwaggerGenerator()
     }
 }

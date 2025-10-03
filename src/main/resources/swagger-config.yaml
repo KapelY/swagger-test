@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Spring Core + Spark API
   description: REST API using Spring Core for DI and Spark for HTTP endpoints
@@ -6,9 +6,6 @@ info:
     name: API Team
     email: team@example.com
   version: 1.0.0
-servers:
-  - url: http://localhost:4567
-    description: Development server
 
 tags:
   - name: Users

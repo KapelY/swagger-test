@@ -1,9 +1,9 @@
 package com.example.routes
+import SwaggerGenerator
 import com.example.model.UserRequest
 import com.example.service.UserService
-import com.example.swagger.SwaggerGenerator
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
+import io.swagger.v3.core.util.Json
 import org.springframework.stereotype.Component
 import spark.Spark.*
 
@@ -11,46 +11,43 @@ import spark.Spark.*
 class SparkRoutes(
     private val userService: UserService,
     private val swaggerGenerator: SwaggerGenerator,
-    private val gson: Gson,
-    private val objectMapper: ObjectMapper
+    private val gson: Gson
 ) {
 
     fun initialize() {
         port(4567)
 
         // CORS
-        before({ _, res ->
+        before({ req, res ->
             res.header("Access-Control-Allow-Origin", "*")
             res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
             res.header("Access-Control-Allow-Headers", "Content-Type")
             res.type("application/json")
         })
 
-        options("/*", { _, _ -> "OK" })
+        options("/*", { req, res -> "OK" })
 
         // Swagger documentation endpoints
-        get("/api-docs", { _, res ->
+        get("/api-docs", { req, res ->
             try {
                 res.type("application/json")
-                val openAPI = swaggerGenerator.generateOpenAPI()
-                // Use Jackson ObjectMapper from swagger to serialize OpenAPI object
-                objectMapper.writeValueAsString(openAPI)
+                val host = req.host()
+                val openAPI = swaggerGenerator.generateOpenAPIWithDynamicServer(host)
+                Json.mapper().writeValueAsString(openAPI)
             } catch (e: Exception) {
-                println("ERROR in /api-docs endpoint: ${e.message}")
-                e.printStackTrace()
                 res.status(500)
                 res.type("application/json")
                 gson.toJson(mapOf("error" to "Failed to load OpenAPI specification: ${e.message}"))
             }
         })
 
-        get("/swagger-ui", { _, res ->
+        get("/swagger-ui", { req, res ->
             res.type("text/html")
             swaggerUI()
         })
 
         // User API endpoints
-        get("/api/users", { _, res ->
+        get("/api/users", { req, res ->
             try {
                 val users = userService.getAllUsers()
                 gson.toJson(users)
