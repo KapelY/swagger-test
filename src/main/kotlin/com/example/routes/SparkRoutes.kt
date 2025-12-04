@@ -18,14 +18,14 @@ class SparkRoutes(
         port(4567)
 
         // CORS
-        before({ req, res ->
+        before({ _, res ->
             res.header("Access-Control-Allow-Origin", "*")
             res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
             res.header("Access-Control-Allow-Headers", "Content-Type")
             res.type("application/json")
         })
 
-        options("/*", { req, res -> "OK" })
+        options("/*", { _, _ -> "OK" })
 
         // Swagger documentation endpoints
         get("/api-docs", { req, res ->
@@ -41,13 +41,13 @@ class SparkRoutes(
             }
         })
 
-        get("/swagger-ui", { req, res ->
+        get("/swagger-ui", { _, res ->
             res.type("text/html")
             swaggerUI()
         })
 
         // User API endpoints
-        get("/api/users", { req, res ->
+        get("/api/users", { _, res ->
             try {
                 val users = userService.getAllUsers()
                 gson.toJson(users)
